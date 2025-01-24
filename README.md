@@ -1,22 +1,12 @@
-# Prisma Zod Generator
+# MHSP Prisma Zod Generator
 
-[![npm version](https://badge.fury.io/js/prisma-zod-generator.svg)](https://badge.fury.io/js/prisma-zod-generator)
-[![npm](https://img.shields.io/npm/dt/prisma-zod-generator.svg)](https://www.npmjs.com/package/prisma-zod-generator)
-[![HitCount](https://hits.dwyl.com/omar-dulaimi/prisma-zod-generator.svg?style=flat)](http://hits.dwyl.com/omar-dulaimi/prisma-zod-generator)
-[![npm](https://img.shields.io/npm/l/prisma-zod-generator.svg)](LICENSE)
+This is a fork of [prisma-zod-generator by Omar Dulaimi](https://github.com/omar-dulaimi/prisma-zod-generator) with some modifications to fit the needs of MHSP.
 
 Automatically generate [Zod](https://github.com/colinhacks/zod) schemas from your [Prisma](https://github.com/prisma/prisma) Schema, and use them to validate your API endpoints or any other use you have. Updates every time `npx prisma generate` runs.
-
-<p align="center">
-  <a href="https://www.buymeacoffee.com/omardulaimi">
-    <img src="https://cdn.buymeacoffee.com/buttons/default-black.png" alt="Buy Me A Coffee" height="41" width="174">
-  </a>
-</p>
 
 ## Table of Contents
 
 - [Supported Prisma Versions](#supported-prisma-versions)
-- [Installation](#installation)
 - [Usage](#usage)
 - [Customizations](#customizations)
 - [Additional Options](#additional-options)
@@ -31,25 +21,9 @@ Automatically generate [Zod](https://github.com/colinhacks/zod) schemas from you
 
 - 0.2.0 and lower
 
-# Installation
-
-Using npm:
-
-```bash
- npm install prisma-zod-generator
-```
-
-Using yarn:
-
-```bash
- yarn add prisma-zod-generator
-```
-
 # Usage
 
-1- Star this repo 😉
-
-2- Add the generator to your Prisma schema
+1- Add the generator to your Prisma schema
 
 ```prisma
 generator zod {
@@ -57,9 +31,9 @@ generator zod {
 }
 ```
 
-3- Enable strict mode in `tsconfig` as it is required by Zod, and considered a Typescript best practice
+2- Enable strict mode in `tsconfig` as it is required by Zod, and considered a Typescript best practice
 
-```ts
+```json
 {
   "compilerOptions": {
     "strict": true
@@ -68,7 +42,7 @@ generator zod {
 
 ```
 
-4- Running `npx prisma generate` for the following schema.prisma
+3- Running `npx prisma generate` for the following schema.prisma
 
 ```prisma
 model User {
@@ -96,7 +70,7 @@ will generate the following files
 
 ![Zod Schemas](https://raw.githubusercontent.com/omar-dulaimi/prisma-zod-generator/master/zodSchemas.png)
 
-5- Use generated schemas somewhere in your API logic, like middleware or decorator
+4- Use generated schemas somewhere in your API logic, like middleware or decorator
 
 ```ts
 import { PostCreateOneSchema } from './prisma/generated/schemas/createOnePost.schema';
@@ -122,11 +96,12 @@ model User {
 
 # Additional Options
 
-| Option              | Description                                                                | Type      | Default       |
-| ------------------- | -------------------------------------------------------------------------- | --------- | ------------- |
-| `output`            | Output directory for the generated zod schemas                             | `string`  | `./generated` |
-| `isGenerateSelect`  | Enables the generation of Select related schemas and the select property   | `boolean` | `false`       |
-| `isGenerateInclude` | Enables the generation of Include related schemas and the include property | `boolean` | `false`       |
+| Option              | Description                                                                     | Type      | Default       |
+|---------------------|---------------------------------------------------------------------------------| --------- | ------------- |
+| `output`            | Output directory for the generated zod schemas                                  | `string`  | `./generated` |
+| `isGenerateSelect`  | Enables the generation of Select related schemas and the select property        | `boolean` | `false`       |
+| `isGenerateInclude` | Enables the generation of Include related schemas and the include property      | `boolean` | `false`       |
+| `isGenerateShallow` | Enables the generation of Shallow input types (no creation of linked resources) | `boolean` | `false`       |
 
 Use additional options in the `schema.prisma`
 
@@ -136,5 +111,6 @@ generator zod {
   output            = "./generated-zod-schemas"
   isGenerateSelect  = true
   isGenerateInclude = true
+  isGenerateShallow = true
 }
 ```

@@ -12,6 +12,7 @@ generator zod {
   output            = "./generated"
   isGenerateSelect  = true
   isGenerateInclude = true
+  isGenerateShallow = true
 }
 
 model User {

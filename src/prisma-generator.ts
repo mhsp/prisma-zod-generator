@@ -2,7 +2,7 @@ import {
   DMMF,
   EnvValue,
   GeneratorConfig,
-  GeneratorOptions
+  GeneratorOptions,
 } from '@prisma/generator-helper';
 import { getDMMF, parseEnvValue } from '@prisma/internals';
 import { promises as fs } from 'fs';
@@ -10,7 +10,7 @@ import {
   addMissingInputObjectTypes,
   hideInputObjectTypesAndRelatedFields,
   resolveAddMissingInputObjectTypeOptions,
-  resolveModelsComments
+  resolveModelsComments,
 } from './helpers';
 import { resolveAggregateOperationSupport } from './helpers/aggregate-helpers';
 import Transformer from './transformer';
@@ -56,7 +56,7 @@ export async function generate(options: GeneratorOptions) {
     const dataSource = options.datasources?.[0];
     const previewFeatures = prismaClientGeneratorConfig?.previewFeatures;
     Transformer.provider = dataSource.provider;
-    Transformer.previewFeatures = previewFeatures
+    Transformer.previewFeatures = previewFeatures;
 
     const generatorConfigOptions = options.generator.config;
 
@@ -80,7 +80,11 @@ export async function generate(options: GeneratorOptions) {
       hiddenFields,
     );
 
-    await generateObjectSchemas(inputObjectTypes);
+    await generateObjectSchemas(
+      inputObjectTypes,
+      addMissingInputObjectTypeOptions['isGenerateShallow'],
+      models.map((model) => model.name),
+    );
     await generateModelSchemas(
       models,
       modelOperations,
@@ -133,12 +137,41 @@ async function generateEnumSchemas(
   await transformer.generateEnumSchemas();
 }
 
-async function generateObjectSchemas(inputObjectTypes: DMMF.InputType[]) {
+async function generateObjectSchemas(
+  inputObjectTypes: DMMF.InputType[],
+  isGenerateShallowObjects: boolean = false,
+  userModelsNames: string[] = [],
+) {
   for (let i = 0; i < inputObjectTypes.length; i += 1) {
     const fields = inputObjectTypes[i]?.fields;
     const name = inputObjectTypes[i]?.name;
     const transformer = new Transformer({ name, fields });
     await transformer.generateObjectSchema();
+
+    if (isGenerateShallowObjects) {
+      const nonRelationFields = fields?.filter((field) =>
+        field.inputTypes.every(
+          (inputType) =>
+            !userModelsNames.some((modelName) =>
+              inputType.type.toString().startsWith(modelName),
+            ),
+        ),
+      );
+
+      if (name === 'PostUpdateInput') debugger;
+
+      if (
+        nonRelationFields?.length === 0 ||
+        nonRelationFields?.length === fields?.length
+      )
+        continue;
+
+      const shallowTransformer = new Transformer({
+        name,
+        fields: nonRelationFields,
+      });
+      await shallowTransformer.generateShallowObjectSchema();
+    }
   }
 }
 

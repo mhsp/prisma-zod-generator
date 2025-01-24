@@ -1,8 +1,8 @@
 import { DMMF } from '@prisma/generator-helper';
 import {
   checkIsModelRelationField,
-  checkModelHasModelRelation,
   checkModelHasManyModelRelation,
+  checkModelHasModelRelation,
 } from './model-helpers';
 
 export function addMissingInputObjectTypesForInclude(
@@ -20,6 +20,7 @@ export function addMissingInputObjectTypesForInclude(
     inputObjectTypes.push(includeInputObjectType);
   }
 }
+
 function generateModelIncludeInputObjectTypes(
   models: DMMF.Model[],
   isGenerateSelect: boolean,

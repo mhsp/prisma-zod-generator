@@ -7,9 +7,10 @@ import { addMissingInputObjectTypesForMongoDbRawOpsAndQueries } from './mongodb-
 import { addMissingInputObjectTypesForSelect } from './select-helpers';
 import { changeOptionalToRequiredFields } from './whereUniqueInput-helpers';
 
-interface AddMissingInputObjectTypeOptions {
+export interface AddMissingInputObjectTypeOptions {
   isGenerateSelect: boolean;
   isGenerateInclude: boolean;
+  isGenerateShallow: boolean;
 }
 
 export function addMissingInputObjectTypes(
@@ -53,6 +54,10 @@ export function addMissingInputObjectTypes(
     );
     Transformer.setIsGenerateInclude(true);
   }
+  if (options.isGenerateShallow) {
+    // TODO: Entry point for custom logic to generate input object types for models without relations
+    Transformer.setisGenerateShallow(true);
+  }
 
   changeOptionalToRequiredFields(inputObjectTypes);
 }
@@ -63,5 +68,7 @@ export function resolveAddMissingInputObjectTypeOptions(
   return {
     isGenerateSelect: generatorConfigOptions.isGenerateSelect === 'true',
     isGenerateInclude: generatorConfigOptions.isGenerateInclude === 'true',
+    isGenerateShallow:
+      generatorConfigOptions.isGenerateShallow === 'true',
   };
 }

@@ -32,6 +32,7 @@ export default class Transformer {
   private static isCustomPrismaClientOutputPath: boolean = false;
   private static isGenerateSelect: boolean = false;
   private static isGenerateInclude: boolean = false;
+  private static isGenerateShallow: boolean = false;
 
   constructor(params: TransformerParams) {
     this.name = params.name ?? '';
@@ -52,6 +53,10 @@ export default class Transformer {
 
   static setIsGenerateInclude(isGenerateInclude: boolean) {
     this.isGenerateInclude = isGenerateInclude;
+  }
+
+  static setisGenerateShallow(isGenerateShallow: boolean) {
+    this.isGenerateShallow = isGenerateShallow;
   }
 
   static getOutputPath() {
@@ -95,6 +100,20 @@ export default class Transformer {
     const zodObjectSchemaFields = this.generateObjectSchemaFields();
     const objectSchema = this.prepareObjectSchema(zodObjectSchemaFields);
     const objectSchemaName = this.resolveObjectSchemaName();
+
+    await writeFileSafely(
+      path.join(
+        Transformer.outputPath,
+        `schemas/objects/${objectSchemaName}.schema.ts`,
+      ),
+      objectSchema,
+    );
+  }
+
+  async generateShallowObjectSchema() {
+    const zodObjectSchemaFields = this.generateObjectSchemaFields();
+    const objectSchema = this.prepareShallowObjectSchema(zodObjectSchemaFields);
+    const objectSchemaName = `${this.resolveObjectSchemaName()}Shallow`;
 
     await writeFileSafely(
       path.join(
@@ -290,6 +309,16 @@ export default class Transformer {
     const json = this.generateJsonSchemaImplementation();
 
     return `${this.generateObjectSchemaImportStatements()}${prismaImportStatement}${json}${objectSchema}`;
+  }
+
+  prepareShallowObjectSchema(zodObjectSchemaFields: string[]) {
+    const objectSchema = `${this.generateExportObjectSchemaStatement(
+      this.addFinalWrappers({ zodStringFields: zodObjectSchemaFields }),
+    )}\n`
+
+    const prismaImportStatement = this.generateImportPrismaStatement();
+
+    return `${this.generateObjectSchemaImportStatements()}${prismaImportStatement}${objectSchema}`;
   }
 
   generateExportObjectSchemaStatement(schema: string) {

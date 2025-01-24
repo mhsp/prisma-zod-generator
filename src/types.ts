@@ -20,3 +20,5 @@ export type AggregateOperationSupport = {
     avg?: boolean;
   };
 };
+
+export type SchemaArgInputType = PrismaDMMF.SchemaArgInputType;
